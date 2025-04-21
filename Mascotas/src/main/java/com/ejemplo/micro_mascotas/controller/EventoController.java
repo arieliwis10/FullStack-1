@@ -1,13 +1,15 @@
 package com.ejemplo.micro_mascotas.controller;
 
 import com.ejemplo.micro_mascotas.model.Evento;
+import com.ejemplo.micro_mascotas.model.ResponseWrapper;
 import com.ejemplo.micro_mascotas.service.EventoService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/eventos")
@@ -19,32 +21,87 @@ public class EventoController {
         this.eventoService = eventoService;
     }
 
+    /**
+     * Obtiene todos los eventos registrados.
+     */
     @GetMapping
-    public ResponseEntity<List<Evento>> obtenerTodas() {
-        return ResponseEntity.ok(eventoService.obtenerTodas());
+    public ResponseEntity<?> obtenerTodas() {
+        List<Evento> eventos = eventoService.obtenerTodas();
+
+        if (eventos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No hay eventos registrados actualmente");
+        }
+
+        return ResponseEntity.ok(
+                new ResponseWrapper<>(
+                        "OK",
+                        eventos.size(),
+                        eventos));
     }
 
+    /**
+     * Obtiene un evento por su ID.
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
-        Optional<Evento> evento = eventoService.obtenerPorId(id);
-        if (evento.isPresent()) {
-            return ResponseEntity.ok(evento.get());
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("mensaje", "Evento con ID " + id + " no encontrado"));
-        }
+    public Evento obtenerPorId(@PathVariable Long id) {
+        return eventoService.obtenerPorId(id); // ya lanza la excepción si no existe
     }
 
+    /**
+     * Obtiene los participantes de un evento por ID.
+     */
     @GetMapping("/{id}/participantes")
-    public ResponseEntity<?> getParticipantes(@PathVariable Long id) {
-        Optional<Evento> evento = eventoService.obtenerPorId(id);
-        if (evento.isPresent()) {
-            return ResponseEntity.ok(evento.get().getParticipantes());
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("mensaje", "No se encontraron participantes porque el evento no existe"));
-        }
+    public ResponseEntity<?> obtenerParticipantes(@PathVariable Long id) {
+        Evento evento = eventoService.obtenerPorId(id); // ya lanza la excepción si no existe
+        return ResponseEntity.ok(
+                new ResponseWrapper<>(
+                        "Participantes del evento",
+                        evento.getParticipantes().size(),
+                        evento.getParticipantes()));
+}
+
+    /**
+     * Crea un nuevo evento.
+     */
+    @PostMapping
+    public ResponseEntity<ResponseWrapper<Evento>> crearEvento(@Valid @RequestBody Evento evento) {
+        Evento creado = eventoService.guardar(evento);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseWrapper<>(
+                        "Evento creado exitosamente",
+                        1,
+                        List.of(creado)));
+    }
+
+    /**
+     * Actualiza un evento por ID.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseWrapper<Evento>> actualizarEvento(@PathVariable Long id,
+            @Valid @RequestBody Evento eventoActualizado) {
+        Evento actualizado = eventoService.actualizar(id, eventoActualizado);
+
+        return ResponseEntity.ok(
+                new ResponseWrapper<>(
+                        "Evento actualizado exitosamente",
+                        1,
+                        List.of(actualizado)));
+    }
+
+    /**
+     * Elimina un evento por ID.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseWrapper<Void>> eliminarEvento(@PathVariable Long id) {
+        eventoService.eliminar(id);
+
+        return ResponseEntity.ok(
+                new ResponseWrapper<>(
+                        "Evento eliminado exitosamente",
+                        0,
+                        null));
     }
 }

@@ -1,0 +1,8 @@
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\MicroservicioVideojuegosApplication.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\model\Videojuego.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\repository\VideojuegoRepository.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\controller\VideojuegoController.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\exception\GlobalExceptionHandler.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\service\VideojuegoService.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\exception\VideojuegoNotFoundException.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\model\ResponseWrapper.java
