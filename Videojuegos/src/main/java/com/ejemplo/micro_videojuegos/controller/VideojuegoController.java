@@ -5,6 +5,7 @@ import com.ejemplo.micro_videojuegos.model.ResponseWrapper;
 import com.ejemplo.micro_videojuegos.service.VideojuegoService;
 
 import jakarta.validation.Valid;
+import lombok.extern.sld4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/videojuegos")
 public class VideojuegoController {
@@ -28,9 +30,13 @@ public class VideojuegoController {
      */
     @GetMapping
     public ResponseEntity<?> obtenerTodas() {
+        log.info("Get / videojuegos - Obteniendo todos los videojuegos");
+
         List<Videojuego> videojuego = videojuegoService.obtenerTodas();
 
         if (videojuego.isEmpty()) {
+            log.warn("No hay videojuegos registrados actualmente");
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No hay videojuego registradas actualmente");
         }
@@ -48,6 +54,7 @@ public class VideojuegoController {
      */
     @GetMapping("/{id}")
     public Videojuego obtenerPorId(@PathVariable Long id) {
+        log.info("Get /videojuegos/{} - Buscando videojuegos por id", id);
         return videojuegoService.obtenerPorId(id);
     }
 
@@ -57,6 +64,7 @@ public class VideojuegoController {
      */
     @PostMapping
     public ResponseEntity<ResponseWrapper<Videojuego>> crearVideojuego(@Valid @RequestBody Videojuego videojuego) {
+        log.info("POST /videojuegos - Creando videojuegos: {}", evento.getTitulo());
         Videojuego creada = videojuegoService.guardar(videojuego);
 
         return ResponseEntity
@@ -75,6 +83,7 @@ public class VideojuegoController {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseWrapper<Videojuego>> actualizarVideojuego(@PathVariable Long id,
             @Valid @RequestBody Videojuego videojuegoActualizada) {
+        log.info("PUT /videojuegos - Actualizando videojuegos", id);
 
                 Videojuego actualizada = videojuegoService.actualizar(id, videojuegoActualizada);
 
@@ -91,6 +100,7 @@ public class VideojuegoController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseWrapper<Void>> eliminarVideojuego(@PathVariable Long id) {
+        log.warn("Delete /videojuegos/{} - Eliminando videojuego", id);
         videojuegoService.eliminar(id);
 
         return ResponseEntity.ok(

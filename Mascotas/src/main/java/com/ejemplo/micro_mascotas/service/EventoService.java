@@ -7,19 +7,23 @@ import com.ejemplo.micro_mascotas.repository.EventoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class EventoService {
 
-    @Autowired
-    private EventoRepository repo;
+    private final EventoRepository repo;
 
-    /**
-     * Obtiene todos los eventos ordenados por ID.
-     */
+    public EventoService(EventoRepository repo) {
+        this.repo = repo;
+    }
+
     public List<Evento> obtenerTodas() {
+
+        log.debug("Servicio: ObtenerTodas()");
         return repo.findAll(Sort.by("id").ascending());
     }
 
@@ -27,6 +31,7 @@ public class EventoService {
      * Obtiene un evento por su ID o lanza una excepción si no existe.
      */
     public Evento obtenerPorId(Long id) {
+        log.debug("Servicio: ObtenerPorId()");
         return repo.findById(id)
                 .orElseThrow(() -> new EventoNotFoundException(id));
     }
@@ -35,6 +40,7 @@ public class EventoService {
      * Guarda un nuevo evento si no existe uno con el mismo ID.
      */
     public Evento guardar(Evento evento) {
+        log.debug("Servicio: Guardar()");
         if (repo.existsById(evento.getId())) {
             throw new IllegalArgumentException("Ya existe un evento con ID " + evento.getId());
         }
@@ -45,6 +51,7 @@ public class EventoService {
      * Actualiza un evento existente.
      */
     public Evento actualizar(Long id, Evento eventoActualizado) {
+        log.debug("Servicio: Actualizar()");
         Evento existente = repo.findById(id)
                 .orElseThrow(() -> new EventoNotFoundException(id));
 
@@ -61,6 +68,7 @@ public class EventoService {
      * Elimina un evento por su ID.
      */
     public void eliminar(Long id) {
+        log.debug("Servicio: Eliminar ()");
         Evento existente = repo.findById(id)
                 .orElseThrow(() -> new EventoNotFoundException(id));
 
