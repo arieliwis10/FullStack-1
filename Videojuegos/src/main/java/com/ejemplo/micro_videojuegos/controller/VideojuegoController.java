@@ -3,16 +3,22 @@ package com.ejemplo.micro_videojuegos.controller;
 import com.ejemplo.micro_videojuegos.model.Videojuego;
 import com.ejemplo.micro_videojuegos.model.ResponseWrapper;
 import com.ejemplo.micro_videojuegos.service.VideojuegoService;
+import com.ejemplo.micro_videojuegos.hateoas.VideojuegoModelAssembler;
 
 import jakarta.validation.Valid;
-import lombok.extern.sld4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Slf4j
 @RestController
@@ -20,94 +26,79 @@ import java.util.List;
 public class VideojuegoController {
 
     private final VideojuegoService videojuegoService;
+    private final VideojuegoModelAssembler assembler;
 
-    public VideojuegoController(VideojuegoService videojuegoService) {
+    // Constructor con inyección del servicio y del assembler
+    public VideojuegoController(VideojuegoService videojuegoService, VideojuegoModelAssembler assembler) {
         this.videojuegoService = videojuegoService;
+        this.assembler = assembler;
     }
 
-     /**
-     * Obtiene todas las videojuego ordenadas por ID.
-     */
+    // ✅ Obtener todos los videojuegos con modelo HATEOAS
     @GetMapping
-    public ResponseEntity<?> obtenerTodas() {
-        log.info("Get / videojuegos - Obteniendo todos los videojuegos");
+    public ResponseEntity<CollectionModel<EntityModel<Videojuego>>> obtenerTodas() {
+        log.info("GET /videojuegos - Obteniendo todos los videojuegos");
 
-        List<Videojuego> videojuego = videojuegoService.obtenerTodas();
+        List<Videojuego> videojuegos = videojuegoService.obtenerTodas();
 
-        if (videojuego.isEmpty()) {
+        if (videojuegos.isEmpty()) {
             log.warn("No hay videojuegos registrados actualmente");
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No hay videojuego registradas actualmente");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(CollectionModel.empty());
         }
 
-        return ResponseEntity.ok(
-                new ResponseWrapper<>(
-                        "OK",
-                        videojuego.size(),
-                        LocalDateTime.now(),
-                        videojuego));
+        List<EntityModel<Videojuego>> modelos = videojuegos.stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(CollectionModel.of(modelos,
+                linkTo(methodOn(VideojuegoController.class).obtenerTodas()).withSelfRel()));
     }
 
-    /**
-     * Busca un videojuego por su ID. Si no la encuentra, lanza una excepción.
-     */
+    // ✅ Obtener videojuego por ID con enlaces HATEOAS
     @GetMapping("/{id}")
-    public Videojuego obtenerPorId(@PathVariable Long id) {
-        log.info("Get /videojuegos/{} - Buscando videojuegos por id", id);
-        return videojuegoService.obtenerPorId(id);
+    public ResponseEntity<EntityModel<Videojuego>> obtenerPorId(@PathVariable Long id) {
+        log.info("GET /videojuegos/{} - Buscando videojuego por ID", id);
+
+        Videojuego videojuego = videojuegoService.obtenerPorId(id);
+
+        return ResponseEntity.ok(assembler.toModel(videojuego));
     }
 
-    /**
-     * 🟦 SESIÓN 5: Crea una videojuego solo si el ID no existe.
-     * Si el ID ya está registrado, lanza un error 400.
-     */
+    // ✅ Crear nuevo videojuego
     @PostMapping
-    public ResponseEntity<ResponseWrapper<Videojuego>> crearVideojuego(@Valid @RequestBody Videojuego videojuego) {
-        log.info("POST /videojuegos - Creando videojuegos: {}", evento.getTitulo());
-        Videojuego creada = videojuegoService.guardar(videojuego);
+    public ResponseEntity<EntityModel<Videojuego>> crearVideojuego(@Valid @RequestBody Videojuego videojuego) {
+        log.info("POST /videojuegos - Creando videojuego: {}", videojuego.getTitulo());
+
+        Videojuego creado = videojuegoService.guardar(videojuego);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ResponseWrapper<>(
-                        "Videojuego creada exitosamente",
-                        1,
-                        LocalDateTime.now(),
-                        List.of(creada)));
+                .body(assembler.toModel(creado));
     }
 
-    /**
-     * 🟦 SESIÓN 5: Actualiza los campos de una videojuego existente.
-     * Lanza error si no existe.
-     */
+    // ✅ Actualizar videojuego
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseWrapper<Videojuego>> actualizarVideojuego(@PathVariable Long id,
-            @Valid @RequestBody Videojuego videojuegoActualizada) {
-        log.info("PUT /videojuegos - Actualizando videojuegos", id);
+    public ResponseEntity<EntityModel<Videojuego>> actualizarVideojuego(@PathVariable Long id,
+            @Valid @RequestBody Videojuego videojuegoActualizado) {
+        log.info("PUT /videojuegos/{} - Actualizando videojuego", id);
 
-                Videojuego actualizada = videojuegoService.actualizar(id, videojuegoActualizada);
+        Videojuego actualizado = videojuegoService.actualizar(id, videojuegoActualizado);
 
-        return ResponseEntity.ok(
-                new ResponseWrapper<>(
-                        "Videojuego actualizada exitosamente",
-                        1,
-                        LocalDateTime.now(),
-                        List.of(actualizada)));
+        return ResponseEntity.ok(assembler.toModel(actualizado));
     }
 
-    /**
-     * 🟦 SESIÓN 5: Elimina una videojuego por ID.
-     */
+    // ✅ Eliminar videojuego
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseWrapper<Void>> eliminarVideojuego(@PathVariable Long id) {
-        log.warn("Delete /videojuegos/{} - Eliminando videojuego", id);
+        log.warn("DELETE /videojuegos/{} - Eliminando videojuego", id);
+
         videojuegoService.eliminar(id);
 
         return ResponseEntity.ok(
                 new ResponseWrapper<>(
-                        "Videojuego eliminada exitosamente",
+                        "Videojuego eliminado exitosamente",
                         0,
-                        LocalDateTime.now(),
+                        LocalDateTime.now(), 
                         null));
     }
 }

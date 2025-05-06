@@ -4,5 +4,8 @@ C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_v
 C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\controller\VideojuegoController.java
 C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\exception\GlobalExceptionHandler.java
 C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\service\VideojuegoService.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\config\CorsConfig.java
 C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\exception\VideojuegoNotFoundException.java
 C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\model\ResponseWrapper.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\hateoas\VideojuegoModelAssembler.java
+C:\Users\ariel\Desktop\FullStack 1\Videojuegos\src\main\java\com\ejemplo\micro_videojuegos\config\SecurityConfig.java

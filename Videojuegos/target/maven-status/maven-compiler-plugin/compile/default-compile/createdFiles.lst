@@ -1,8 +1,12 @@
+com\ejemplo\micro_videojuegos\config\CorsConfig.class
 com\ejemplo\micro_videojuegos\service\VideojuegoService.class
 com\ejemplo\micro_videojuegos\repository\VideojuegoRepository.class
 com\ejemplo\micro_videojuegos\MicroservicioVideojuegosApplication.class
 com\ejemplo\micro_videojuegos\exception\VideojuegoNotFoundException.class
 com\ejemplo\micro_videojuegos\exception\GlobalExceptionHandler.class
 com\ejemplo\micro_videojuegos\model\Videojuego.class
+com\ejemplo\micro_videojuegos\config\SecurityConfig.class
 com\ejemplo\micro_videojuegos\model\ResponseWrapper.class
+com\ejemplo\micro_videojuegos\config\CorsConfig$1.class
+com\ejemplo\micro_videojuegos\hateoas\VideojuegoModelAssembler.class
 com\ejemplo\micro_videojuegos\controller\VideojuegoController.class
